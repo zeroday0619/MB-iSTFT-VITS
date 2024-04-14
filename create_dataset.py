@@ -26,7 +26,7 @@ import argparse
 
 
 class SpeechRecognizer(object):
-    def __init__(self, speech_recognition_language: str, file: str) -> None:
+    def __init__(self, file: str) -> None:
         self.whisper = whisper.load_model("large")
         self.file = file
     
@@ -56,6 +56,5 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     source = SpeechRecognizer(
-        speech_recognition_language=args.lang,
         file=args.file
     ).write_audio_text_filelist(args.name)
