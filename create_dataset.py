@@ -21,32 +21,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-
-import os
+import whisper
 import argparse
-import httpx
 
 
 class SpeechRecognizer(object):
     def __init__(self, speech_recognition_language: str, file: str) -> None:
+        self.whisper = whisper.load_model("large")
         self.file = file
-        self.url = f"https://{os.environ['AZURE_REGION']}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1"
-        self.params = {
-            "language": speech_recognition_language,
-            "format": "detailed"
-        }
-        self.headers = {
-            "Ocp-Apim-Subscription-Key": os.environ['AZURE_SPEECH_SERVICES_API_KEY'],
-            "Content-Type": "audio/wav",
-        }
     
     def recognize(self):
-        session = httpx.Client(
-            headers=self.headers
-        )
-        resp = session.post(self.url, data=open(self.file, "rb"), params=self.params)
-        resp.raise_for_status()
-        return resp.json()['DisplayText']
+        transcribe = self.whisper.transcribe(self.file)
+        return transcribe['text']
     
     def write_audio_text_filelist(self, name: str):
         with open(f"filelists/{name}_audio_text_filelist.txt", "+a") as f:
@@ -54,13 +40,7 @@ class SpeechRecognizer(object):
         
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Azure Speech Recognition & VITS Dataset Preparation"
-    )
-    parser.add_argument(
-        "--lang",
-        type=str,
-        default="ja-JP",
-        help="Speech recognition language"
+        description="Open AI Whisper Speech Recognition & VITS Dataset Preparation"
     )
     parser.add_argument(
         "--file",
