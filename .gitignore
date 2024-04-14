@@ -1,0 +1,4 @@
+dataset/*.wav
+monotonic_align/build/*
+monotonic_align/core.c
+monotonic_align/monotonic_align/*
